@@ -21,6 +21,7 @@ alembic = "^1.6"
 python-slugify = "^5.0"
 Unidecode = "^1.1"
 loguru = "^0.5.1"
+isort = "^5.9.2"
 
 [tool.poetry.dev-dependencies]
 black = "^21.6b0"

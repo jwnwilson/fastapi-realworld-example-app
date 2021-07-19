@@ -1,0 +1,95 @@
+version: 2.1
+# Define the jobs we want to run for this project
+jobs:
+  test:
+    docker:
+      - image: cimg/python:3.9.6
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          command: pip install virtualenv poetry invoke && virtualenv ./venv && echo "source ./venv/bin/activate" >> $BASH_ENV
+          name: Create virtualenv
+      - restore_cache:
+          keys:
+              - python-cache-1-{{ arch }}-{{ checksum "requirements.txt" }}
+      - run: 
+          command: poetry install
+          name: Install dependencies
+      - save_cache:
+          key: python-cache-1-{{ arch }}-{{ checksum "requirements.txt" }}
+          paths:
+              - venv
+      - run:
+          command: inv lint --check
+          name: Run linting
+      - run:
+          command: PYTHONPATH=$(pwd)/app FLASK_ENV=testing pytest
+          name: Run tests
+  build_deploy:
+    docker:
+      - image: cimg/python:3.9.6
+    parameters:
+      environment:
+        description: The environment to deploy to
+        type: string
+    steps:
+      - checkout
+      - setup_remote_docker
+      - restore_cache:
+          keys:
+              - python-cache-1-{{ arch }}-{{ checksum "requirements.txt" }}
+      - run:
+          command: pip install virtualenv poetry invoke && virtualenv ./venv && echo "source ./venv/bin/activate" >> $BASH_ENV
+          name: Create virtualenv
+      - run: 
+          command: poetry install
+          name: Install dependencies
+      - save_cache:
+          key: python-cache-1-{{ arch }}-{{ checksum "requirements.txt" }}
+          paths:
+              - venv
+      - run:
+          # Details for this are here: https://circleci.com/blog/gcp-cloudrun-orb/
+          command: |
+            inv build
+            inv deploy
+          name: Run build and deploy
+
+# Orchestrate our job run sequence
+workflows:
+  test:
+    jobs:
+      - test
+    when:
+      and:
+        - not:
+            equal:
+              - develop
+              - << pipeline.git.branch >>
+        - not:
+            equal:
+              - main
+              - << pipeline.git.branch >>
+  test_build_deploy_staging:
+    jobs:
+      - test
+      - build_deploy:
+          environment: staging
+          requires:
+            - test
+    when:
+      equal:
+        - develop
+        - << pipeline.git.branch >>
+  test_build_deploy_production:
+    jobs:
+      - test
+      - build_deploy:
+          environment: production
+          requires:
+            - test
+    when:
+      equal:
+        - main
+        - << pipeline.git.branch >>
