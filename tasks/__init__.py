@@ -66,3 +66,23 @@ def lint(c, check=False):
 @task
 def init_db(c):
     c.run(DOCKER_COMPOSE_RUN.format(DOCKER_COMPOSE, "python ./app/commands/init_db.py"))
+
+
+@task
+def tf_init(c):
+    c.run(f"cd tf && terraform init")
+
+
+@task
+def tf_plan(c):
+    c.run(f"cd tf && terraform plan")
+
+
+@task
+def tf_apply(c):
+    c.run(f"cd tf && terraform apply")
+
+
+@task
+def tf_destroy(c):
+    c.run(f"cd tf && terraform destroy")
