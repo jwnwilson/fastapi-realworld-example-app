@@ -32,7 +32,6 @@ def build(c):
     c.run(f"{DOCKER_COMPOSE} build")
 
 
-@task
 def auth_ecr(c):
     pass
 
