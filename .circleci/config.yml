@@ -12,12 +12,12 @@ jobs:
           name: Create virtualenv
       - restore_cache:
           keys:
-              - python-cache-1-{{ arch }}-{{ checksum "requirements.txt" }}
+              - python-cache-1-{{ arch }}-{{ checksum "poetry.lock" }}
       - run: 
           command: poetry install
           name: Install dependencies
       - save_cache:
-          key: python-cache-1-{{ arch }}-{{ checksum "requirements.txt" }}
+          key: python-cache-1-{{ arch }}-{{ checksum "poetry.lock" }}
           paths:
               - venv
       - run:
@@ -38,7 +38,7 @@ jobs:
       - setup_remote_docker
       - restore_cache:
           keys:
-              - python-cache-1-{{ arch }}-{{ checksum "requirements.txt" }}
+              - python-cache-1-{{ arch }}-{{ checksum "poetry.lock" }}
       - run:
           command: pip install virtualenv poetry invoke && virtualenv ./venv && echo "source ./venv/bin/activate" >> $BASH_ENV
           name: Create virtualenv
@@ -46,7 +46,7 @@ jobs:
           command: poetry install
           name: Install dependencies
       - save_cache:
-          key: python-cache-1-{{ arch }}-{{ checksum "requirements.txt" }}
+          key: python-cache-1-{{ arch }}-{{ checksum "poetry.lock" }}
           paths:
               - venv
       - run:

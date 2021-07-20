@@ -22,7 +22,7 @@ def activate_venv(c):
 
 
 @task
-def python_deps(c):
+def install(c):
     activate_venv(c)
     c.run("poetry install")
 
@@ -51,7 +51,12 @@ def run(c):
 @task
 def test(c, args=""):
     activate_venv(c)
-    c.run(DOCKER_COMPOSE_RUN.format(DOCKER_COMPOSE, f"pytest --cov=app --cov=tests --cov-report=term-missing --cov-config=setup.cfg {args}"))
+    c.run(
+        DOCKER_COMPOSE_RUN.format(
+            DOCKER_COMPOSE,
+            f"pytest --cov=app --cov=tests --cov-report=term-missing --cov-config=setup.cfg {args}",
+        )
+    )
 
 
 @task
