@@ -7,7 +7,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker:
-        version: 19.03.13
+          version: 19.03.13
       - run:
           command: pip install virtualenv poetry invoke && virtualenv ./venv && echo "source ./venv/bin/activate" >> $BASH_ENV
           name: Create virtualenv
