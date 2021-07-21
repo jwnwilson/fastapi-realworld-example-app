@@ -3,9 +3,12 @@ version: 2.1
 jobs:
   test:
     machine:
-        image: cimg/python:3.9.6
+        image: ubuntu-2004:202104-01
     steps:
       - checkout
+      - run:
+          name: "Set Python Version"
+          command: pyenv global 3.9.4
       - run:
           command: pip install virtualenv poetry invoke && virtualenv ./venv && echo "source ./venv/bin/activate" >> $BASH_ENV
           name: Create virtualenv
